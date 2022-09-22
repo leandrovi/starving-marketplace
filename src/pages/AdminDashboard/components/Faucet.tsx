@@ -1,6 +1,8 @@
 import Nullstack, { NullstackNode } from "nullstack";
 import * as fcl from "@onflow/fcl";
 
+import GET_TAP_BALANCE from '../../../../cadence/scripts/GetTAPBalance.cdc';
+
 import IconTitle from "./IconTitle";
 import Button from "../../../shared/components/Button";
 import { AppClientContext } from "../../../../client";
@@ -20,7 +22,7 @@ class Faucet extends Nullstack {
   taps: 0;
   isLoading = false;
 
-  async launch({ bind }: AppClientContext) {
+  async hydrate({ bind }: AppClientContext) {
     const walletInputValue = bind.object[bind.property];
     this.walletAddress = walletInputValue;
   }
@@ -34,6 +36,7 @@ class Faucet extends Nullstack {
   async connectWallet(context: AppClientContext) {
     this.isLoading = true;
     const { bind } = context;
+    console.log(this.walletAddress);
 
     const account = await fcl
       .send([fcl.getAccount(this.walletAddress)])
@@ -44,7 +47,16 @@ class Faucet extends Nullstack {
 
     context.adminAccount = account;
     this.isLoading = false;
-    console.log({ context });
+  }
+
+  async getAccountBalance() {
+    const result = await fcl.query({
+      cadence: 
+    })
+  }
+
+  async depositTaps() {
+    console.log(this.taps);
   }
 
   renderInput({
