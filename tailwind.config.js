@@ -16,12 +16,13 @@ module.exports = {
     },
     colors: {
       white: "#FFFFFF",
+      lightGray: "#CECECE",
       mediumGray: "#938E8E",
       gray: "#3F3F3F",
       darkGray: "#111111",
       black: "#000000",
       yellow: "#FDC500",
-      pink: "##FF8896",
+      pink: "#FF8896",
       gradients: {
         linear: {
           yellowBg:
