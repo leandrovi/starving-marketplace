@@ -1,5 +1,5 @@
 import Nullstack, { NullstackClientContext, NullstackNode } from "nullstack";
-import AdminDashboard from "../pages/AdminDashboard";
+import AdminDashboard from "../pages/AdminDashboard/AdminDashboard";
 
 declare function Menu(): NullstackNode;
 declare function Logo(): NullstackNode;
