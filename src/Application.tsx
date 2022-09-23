@@ -34,7 +34,7 @@ class Application extends Nullstack {
       <body class="bg-black text-white font-kanit min-h-screen">
         <Head />
         <HomeRoutes route="/" />
-        <AdminRoutes route="/admin" />
+        <AdminRoutes route="/admin/*" />
       </body>
     );
   }

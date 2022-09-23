@@ -7,10 +7,11 @@ import { Account } from "./src/appTypes/flow";
 
 export type AppClientContext<TProps = unknown> =
   NullstackClientContext<TProps> & {
+    isAuthenticated: boolean;
     adminAccount: Account;
   };
 
-const context = Nullstack.start(Application) as NullstackClientContext;
+const context = Nullstack.start(Application) as AppClientContext;
 
 context.start = async function start() {
   fcl.config(fclConfig);

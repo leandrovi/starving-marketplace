@@ -150,27 +150,19 @@ pub contract TAPToken {
     // be initialized at deployment. This is just an example of what
     // an implementation could do in the init function. The numbers are arbitrary.
     init() {
-        self.totalSupply = 30.0
+        self.totalSupply = 0.0
 
-        // create the Vault with the initial balance and put it in storage
-        // account.save saves an object to the specified `to` path
-        // The path is a literal path that consists of a domain and identifier
-        // The domain must be `storage`, `private`, or `public`
-        // the identifier can be any name
+        // Creating Vault and Minter resources
         let vault <- create Vault(balance: self.totalSupply)
-        self.account.save(<-vault, to: /storage/TAPVault)
+        self.account.save(<-vault, to: /storage/TAPVault) // Will have public Capability
+        self.account.save(<-create VaultMinter(), to: /storage/TAPMinter) // Will have private Capability
 
-        // Create a new MintAndBurn resource and store it in account storage
-        self.account.save(<-create VaultMinter(), to: /storage/TAPMinter)
+        // Private Capability (only the admin will be able to create/mint TAPs)
+        self.account.link<&VaultMinter>(/private/Minter, target: /storage/TAPMinter)
 
-        // Create a private capability link for the Minter
-        // Capabilities can be used to create temporary references to an object
-        // so that callers can use the reference to access fields and functions
-        // of the objet.
-        //
-        // The capability is stored in the /public/ domain, which is
-        // accesible by everyone  🔥
-        self.account.link<&VaultMinter>(/public/Minter, target: /storage/TAPMinter)
+        // Public Capabilities
+        // Receiver capability in the Vault (expose the balance field and the deposit function)
+        self.account.link<&Vault{Receiver, Balance}>(/public/TAPReceiver, target: /storage/TAPVAult)
     }
 }
 

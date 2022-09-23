@@ -1,8 +1,11 @@
 import Nullstack, { NullstackClientContext, NullstackNode } from "nullstack";
+
+import { AppClientContext } from "../../client";
 import AdminDashboard from "../pages/AdminDashboard/AdminDashboard";
+import AdminAuth from "../pages/AdminAuth/AdminAuth";
+import Logo from "../shared/components/Logo";
 
 declare function Menu(): NullstackNode;
-declare function Logo(): NullstackNode;
 declare function Routes(): NullstackNode;
 
 class AdminRoutes extends Nullstack {
@@ -11,16 +14,10 @@ class AdminRoutes extends Nullstack {
     page.description = `${project.name} is focused on embarrassing "non-profitable" institutions that only seeks (wait for it) profit.`;
   }
 
-  renderLogo() {
-    return (
-      <div class="flex flex-col items-center justify-center">
-        <p class="font-medium text-xs tracking-[0.13em]">NFTS FOR</p>
-        <p class="font-thin text-mxl tracking-[0.15em]">
-          STARVING <br />
-          CHILDREN
-        </p>
-      </div>
-    );
+  async initiate({ isAuthenticated, router }: AppClientContext) {
+    if (!isAuthenticated) {
+      router.path = "/admin/auth";
+    }
   }
 
   renderMenu() {
@@ -35,15 +32,18 @@ class AdminRoutes extends Nullstack {
     return (
       <>
         <AdminDashboard route="/admin" />
+        <AdminAuth route="/admin/auth" />
         {/* TODO: add other routes here */}
       </>
     );
   }
 
-  render() {
+  render({ isAuthenticated }: AppClientContext) {
+    if (!this.initiated) return false;
+
     return (
       <div class="flex flex-row">
-        <Menu />
+        {isAuthenticated && <Menu />}
         <main class="bg-darkGray h-screen flex-1">
           <Routes />
         </main>
