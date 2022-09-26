@@ -20,6 +20,7 @@
     "elliptic": "^6.5.4",
     "mongodb": "^4.10.0",
     "mongoose": "^6.6.1",
-    "sha3": "^2.1.4"
+    "sha3": "^2.1.4",
+    "tailwindcss-border-gradients": "^2.0.3"
   }
 }

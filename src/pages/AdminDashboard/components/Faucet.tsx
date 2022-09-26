@@ -61,7 +61,8 @@ class Faucet extends Nullstack {
 
       await fcl.tx(transactionId).onceSealed();
     } catch (err) {
-      // TODO: treat errors
+      // The user doesn't have the TAP Vault yet
+      // User needs to sign up and setup the account
       console.log({ err });
     }
   }
