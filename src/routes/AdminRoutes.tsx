@@ -1,11 +1,14 @@
 import Nullstack, { NullstackClientContext, NullstackNode } from "nullstack";
+import * as fcl from "@onflow/fcl";
 
 import { AppClientContext } from "../../client";
 import AdminDashboard from "../pages/AdminDashboard/AdminDashboard";
 import AdminAuth from "../pages/AdminAuth/AdminAuth";
 import Logo from "../shared/components/Logo";
+import { maskWalletAddress } from "../utils/maskWalletAddress";
 
 declare function Menu(): NullstackNode;
+declare function UserInfo(): NullstackNode;
 declare function Routes(): NullstackNode;
 
 class AdminRoutes extends Nullstack {
@@ -20,10 +23,34 @@ class AdminRoutes extends Nullstack {
     }
   }
 
+  logout(context: AppClientContext) {
+    fcl.unauthenticate();
+    context.isAuthenticated = false;
+    context.router.path = "/admin/auth";
+  }
+
   renderMenu() {
     return (
       <div class="w-[224px] h-screen px-9 py-10">
         <Logo />
+      </div>
+    );
+  }
+
+  renderUserInfo({ adminUser }: AppClientContext) {
+    return (
+      <div class="absolute right-[68px] top-[65px] flex flex-row align-center">
+        <div class="flex flex-row align-center">
+          <img src="/icons/wallet.svg" alt="Wallet" />
+          <p class="ml-1 mr-4 font-thin">{maskWalletAddress(adminUser.addr)}</p>
+        </div>
+        <button
+          onclick={this.logout}
+          class="font-thin flex flex-row align-center"
+        >
+          <img src="/icons/logout.svg" alt="logout" />
+          <p class="font-thin ml-1">logout</p>
+        </button>
       </div>
     );
   }
@@ -44,6 +71,7 @@ class AdminRoutes extends Nullstack {
     return (
       <div class="flex flex-row">
         {isAuthenticated && <Menu />}
+        {isAuthenticated && <UserInfo />}
         <main class="bg-darkGray h-screen flex-1">
           <Routes />
         </main>

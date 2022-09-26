@@ -17,3 +17,13 @@ export interface Account {
   contracts: any;
   keys: Key[];
 }
+
+export interface FlowUser {
+  f_type: string;
+  f_vsn: string;
+  addr?: string;
+  cid?: string;
+  loggedIn?: boolean;
+  expiresAt?: Date;
+  services: any[];
+}

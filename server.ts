@@ -8,4 +8,5 @@ context.start = async function start() {
   await Dependency._start(context);
 };
 
+export { ServerContext };
 export default context;

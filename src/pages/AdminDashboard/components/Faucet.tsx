@@ -2,13 +2,11 @@ import Nullstack, { NullstackNode } from "nullstack";
 import * as fcl from "@onflow/fcl";
 
 const GET_TAP_BALANCE: string = require("../../../../cadence/scripts/GetTAPBalance.cdc");
-const SETUP_TAP_ACCOUNT: string = require("../../../../cadence/transactions/SetupTAPAccount.cdc");
 const MINT_TAPS: string = require("../../../../cadence/transactions/MintTAPs.cdc");
 
 import IconTitle from "./IconTitle";
 import Button from "../../../shared/components/Button";
 import { AppClientContext } from "../../../../client";
-import { Account } from "../../../appTypes/flow";
 
 interface InputProps {
   name: string;
@@ -24,35 +22,12 @@ class Faucet extends Nullstack {
   walletAddress: string;
   taps: 0;
   isLoading = false;
-
-  async hydrate({ bind }: AppClientContext) {
-    const walletInputValue = bind.object[bind.property];
-    this.walletAddress = walletInputValue;
-  }
+  successMessage: string;
 
   // TODO: add correct type
   onWalletChange({ event }) {
     const wallet = event.target.value;
     this.walletAddress = wallet;
-  }
-
-  async mintAndSend(context: AppClientContext) {
-    try {
-      this.isLoading = true;
-
-      const account = await fcl
-        .send([fcl.getAccount(this.walletAddress)])
-        .then(fcl.decode);
-
-      const balance = await this.getAccountBalance();
-      console.log({ balance });
-      await this.depositTAPs(context);
-    } catch (err) {
-      // TODO: handle errors -> user didn't setup the account yet
-      console.log({ err });
-    } finally {
-      this.isLoading = false;
-    }
   }
 
   async getAccountBalance(): Promise<number> {
@@ -63,31 +38,47 @@ class Faucet extends Nullstack {
       });
 
       return Number(result);
-    } catch (error) {
-      // Balance doesn't exist - user needs to sign up and setup the account
-      console.log({ error });
+    } catch (err) {
+      // Balance (Receiver Capability) doesn't exist
+      // User needs to sign up and setup the account
+      console.log({ err });
     }
   }
 
-  async depositTAPs({ adminAccount }: AppClientContext) {
-    console.log({ adminAccount });
+  async depositTAPs() {
     try {
-      // const transactionId = await fcl.mutate({
-      //   cadence: MINT_TAPS,
-      //   args: (arg, t) => [
-      //     // arg(this.walletAddress, t.Address),
-      //     arg(this.taps, t.UFix64),
-      //   ],
-      //   proposer: adminAccount,
-      //   payer: adminAccount,
-      //   authorizations: [adminAccount],
-      //   limit: 50,
-      // });
-      // const result = await fcl.tx(transactionId).onceSealed();
-      // console.log({ result });
+      const transactionId = await fcl.mutate({
+        cadence: MINT_TAPS,
+        args: (arg, t) => [
+          arg(this.walletAddress, t.Address),
+          arg(this.taps, t.UFix64),
+        ],
+        proposer: fcl.currentUser,
+        payer: fcl.currentUser,
+        authorizations: [fcl.currentUser],
+        limit: 100,
+      });
+
+      await fcl.tx(transactionId).onceSealed();
     } catch (err) {
       // TODO: treat errors
       console.log({ err });
+    }
+  }
+
+  async mintAndSend(context: AppClientContext) {
+    try {
+      this.isLoading = true;
+      await this.depositTAPs();
+      const balance = await this.getAccountBalance();
+
+      this.walletAddress = undefined;
+      this.taps = undefined;
+      this.successMessage = `Now your balance is ${balance} TAP 🎉`;
+    } catch (err) {
+      console.log({ err });
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -147,13 +138,18 @@ class Faucet extends Nullstack {
           placeholder="Enter the Wallet address (0x...) or ENS Domain"
         />
         <QuantityInput />
-        <Button
-          isLoading={this.isLoading}
-          onclick={this.mintAndSend}
-          disabled={!this.walletAddress || !this.taps}
-        >
-          Mint & Send
-        </Button>
+        <div class="flex flex-row align-center mt-12">
+          <Button
+            isLoading={this.isLoading}
+            onclick={this.mintAndSend}
+            disabled={!this.walletAddress || !this.taps}
+          >
+            Mint & Send
+          </Button>
+          {this.successMessage && (
+            <p class="font-thin ml-4 self-center">{this.successMessage}</p>
+          )}
+        </div>
       </div>
     );
   }

@@ -1,8 +1,10 @@
 import Nullstack, { NullstackServerContext } from "nullstack";
 import mongoose from "mongoose";
+import { Account } from "./appTypes/flow";
 
 export interface ServerContext extends NullstackServerContext {
   database: typeof mongoose;
+  adminAccount?: Account;
 }
 
 class Dependency extends Nullstack {

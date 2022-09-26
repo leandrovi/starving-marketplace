@@ -3,34 +3,68 @@ import * as fcl from "@onflow/fcl";
 
 import { AppClientContext } from "../../../client";
 import Button from "../../shared/components/Button";
-import Input from "../../shared/components/Input";
 import Logo from "../../shared/components/Logo";
+import { FlowUser } from "../../appTypes/flow";
+import { UserModel } from "../../models/UserModel";
 
 class AdminAuth extends Nullstack {
-  isAuthenticating: boolean;
+  isAuthenticating = false;
+  error = "";
 
-  // TODO: add proper type after event type is fixed
-  async authenticateAdmin(context) {
+  static async fetchUser({ walletAddress }) {
+    try {
+      return await UserModel.findOne({
+        walletAddress: walletAddress,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async hydrate(context: AppClientContext) {
+    fcl.currentUser.subscribe(async (flowUser: FlowUser) => {
+      if (flowUser.addr) {
+        // @ts-ignore
+        const appUser = await this.fetchUser({ walletAddress: flowUser.addr });
+
+        // Treat cases where user doesn't have an account yet
+        if (this.isAuthenticating && !appUser) {
+          this.error = "Ops, it looks like you don't have an account";
+          this.isAuthenticating = false;
+          context.isAuthenticated = false;
+          fcl.unauthenticate();
+          return;
+        }
+
+        // Treat cases where user is trying to log in as non admin
+        if (this.isAuthenticating && appUser.role !== "admin") {
+          this.error =
+            "Ops, it looks like you're not an admin, please try again with a different account.";
+          this.isAuthenticating = false;
+          context.isAuthenticated = false;
+          fcl.unauthenticate();
+          return;
+        }
+
+        // User has addr and user is admin
+        this.isAuthenticating = false;
+        context.isAuthenticated = true;
+        context.adminUser = flowUser;
+        context.router.path = "/admin";
+      }
+    });
+  }
+
+  async authenticateAdmin() {
     this.isAuthenticating = true;
+    this.error = "";
 
-    const { event } = context;
-    const { value: email } = event.target.email;
-    const { value: password } = event.target.password;
+    const currentUser = await fcl.currentUser.snapshot();
 
-    console.log({ email, password });
-
-    // TODO: call mongo to fetch user details
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    const walletAddress = "0x56f7fb68a7a63940";
-
-    const account = await fcl
-      .send([fcl.getAccount(walletAddress)])
-      .then(fcl.decode);
-
-    context.adminAccount = account;
-    context.isAuthenticated = true;
-    this.isAuthenticating = false;
-    context.router.path = "/admin";
+    if (!currentUser.addr) {
+      fcl.authenticate();
+      return;
+    }
   }
 
   render() {
@@ -38,21 +72,19 @@ class AdminAuth extends Nullstack {
       <div class="flex flex-col items-center justify-center w-screen h-screen">
         <Logo />
 
-        <form
-          class="flex flex-col max-w-[500px] m-8 w-full"
-          onsubmit={this.authenticateAdmin}
-        >
-          <Input label="E-mail" name="email" type="email" required={true} />
-          <Input
-            label="Password"
-            name="password"
-            type="password"
-            required={true}
-          />
-          <Button bg="#FDC500" type="submit" isLoading={this.isAuthenticating}>
-            Sign In
+        <div class="flex flex-col max-w-[500px] m-8 w-full">
+          <Button
+            bg="#FDC500"
+            onclick={this.authenticateAdmin}
+            isLoading={this.isAuthenticating}
+          >
+            Admin Sign In
           </Button>
-        </form>
+
+          {!!this.error && (
+            <p class="text-red font-thin text-center">{this.error}</p>
+          )}
+        </div>
       </div>
     );
   }

@@ -23,6 +23,7 @@ module.exports = {
       black: "#000000",
       yellow: "#FDC500",
       pink: "#FF8896",
+      red: "#F00",
       gradients: {
         linear: {
           yellowBg:

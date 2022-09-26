@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "@onflow/types": "^1.0.3",
+    "elliptic": "^6.5.4",
     "mongodb": "^4.10.0",
-    "mongoose": "^6.6.1"
+    "mongoose": "^6.6.1",
+    "sha3": "^2.1.4"
   }
 }

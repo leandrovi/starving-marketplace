@@ -159,10 +159,6 @@ pub contract TAPToken {
 
         // Private Capability (only the admin will be able to create/mint TAPs)
         self.account.link<&VaultMinter>(/private/Minter, target: /storage/TAPMinter)
-
-        // Public Capabilities
-        // Receiver capability in the Vault (expose the balance field and the deposit function)
-        self.account.link<&Vault{Receiver, Balance}>(/public/TAPReceiver, target: /storage/TAPVAult)
     }
 }
 

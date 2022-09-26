@@ -1,4 +1,4 @@
-import TAPToken from 0x56f7fb68a7a63940
+import TAPToken from 0x72e46439286bcfe4
 
 // This transaction configures an account to store and receive tokens defined by
 // the TAPToken contract.
@@ -11,12 +11,12 @@ transaction(account: Address) {
 		acct.save<@TAPToken.Vault>(<-vault, to: /storage/TAPVault)
 
     // Create a public Receiver capability to the Vault
-		let ReceiverRef = acct.link<&TAPToken.Vault{TAPToken.Receiver, TAPToken.Balance}>(/public/TAPReceiver, target: /storage/TAPVault)
+		let ReceiverRef = acct.link<&TAPToken.Vault{TAPToken.Receiver, TAPToken.Balance}>(/public/TAPVaultReceiver, target: /storage/TAPVault)
 	}
 
     post {
         // Check that the capabilities were created correctly
-        getAccount(account).getCapability<&TAPToken.Vault{TAPToken.Receiver}>(/public/TAPReceiver)
+        getAccount(account).getCapability<&TAPToken.Vault{TAPToken.Receiver}>(/public/TAPVaultReceiver)
                         .check():  
                         "Vault Receiver Reference was not created correctly"
     }

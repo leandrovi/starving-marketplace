@@ -20,7 +20,7 @@ class Button extends Nullstack<ButtonProps> {
   }: NullstackClientContext<ButtonProps>) {
     return (
       <button
-        class="disabled:opacity-50 disabled:cursor-not-allowed min-w-[160px] active:brightness-50 mt-12 bg-pink text-black font-bold text-[18px] py-[18px] px-[27.5px] hover:brightness-90 ease-linear duration-200"
+        class="disabled:opacity-50 disabled:cursor-not-allowed min-w-[160px] active:brightness-50 bg-pink text-black font-bold text-[18px] py-[18px] px-[27.5px] hover:brightness-90 ease-linear duration-200"
         style={`background-color: ${bg}`}
         onclick={onclick}
         disabled={disabled}
