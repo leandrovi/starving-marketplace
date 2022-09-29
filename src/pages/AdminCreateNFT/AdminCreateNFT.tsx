@@ -1,20 +1,18 @@
-import Nullstack, {
-  NullstackEnvironment,
-  NullstackNode,
-  NullstackPage,
-  NullstackParams,
-  NullstackProject,
-  NullstackRouter,
-  NullstackSettings,
-  NullstackWorker,
-} from "nullstack";
+import Nullstack, { NullstackNode } from "nullstack";
+import { Web3Storage } from "web3.storage";
+import * as fcl from "@onflow/fcl";
+
 // @ts-ignore
 import Dropzone from "dropzone";
+
+const MINT_NFT: string = require("../../../cadence/transactions/MintStarvingChildrenNFT.cdc");
 
 import { AppClientContext } from "../../../client";
 import Button from "../../shared/components/Button";
 import Input from "../../shared/components/Input";
 import Textarea from "../../shared/components/Textarea";
+import { NFTModel } from "../../models/NFTModel";
+import { NFT } from "../../appTypes/types";
 
 declare function QuantityInput(): NullstackNode;
 
@@ -32,6 +30,7 @@ const dropdownConfig = {
 };
 
 class AdminCreateNFT extends Nullstack {
+  isLoading = false;
   sideADropzone: Dropzone;
   sideBDropzone: Dropzone;
 
@@ -47,6 +46,10 @@ class AdminCreateNFT extends Nullstack {
   sideBExternalLink: string;
   sideBDescription: string;
 
+  static async getWeb3StorageToken({ secrets }) {
+    return secrets.web3StorageToken;
+  }
+
   async hydrate() {
     this.sideADropzone = new Dropzone("#dropzone-a", dropdownConfig);
     this.sideBDropzone = new Dropzone("#dropzone-b", dropdownConfig);
@@ -60,32 +63,96 @@ class AdminCreateNFT extends Nullstack {
     });
   }
 
-  async createNFT() {
-    const {
-      sideAFile,
-      sideAName,
-      sideAExternalLink,
-      maxEditions,
-      sideADescription,
-      taps,
-      sideBFile,
-      sideBName,
-      sideBExternalLink,
-      sideBDescription,
-    } = this;
+  static async postNFT({ data }) {
+    return await NFTModel.create(data);
+  }
 
-    console.log({
-      sideAFile,
-      sideAName,
-      sideAExternalLink,
-      maxEditions,
-      sideADescription,
-      taps,
-      sideBFile,
-      sideBName,
-      sideBExternalLink,
-      sideBDescription,
-    });
+  async mintNFT(context: AppClientContext<{ nftData: Partial<NFT> }>) {
+    const {
+      nftData: { name, description, fileCID },
+      adminUser: { addr },
+    } = context;
+
+    const addressWithoutPrefix = addr.substring(2);
+
+    try {
+      const transactionId = await fcl.mutate({
+        cadence: MINT_NFT,
+        args: (arg, t) => [
+          arg(addr, t.Address),
+          arg(name, t.String),
+          arg(description, t.String),
+          arg(fileCID, t.String),
+        ],
+        proposer: fcl.currentUser,
+        payer: fcl.currentUser,
+        authorizations: [fcl.currentUser],
+        limit: 100,
+      });
+
+      const { events } = await fcl.tx(transactionId).onceSealed();
+      const { data: eventData } = events.find(
+        (event) => event.type === `A.${addressWithoutPrefix}.StarvingNFT.Minted`
+      );
+      const nftId = eventData.id as string;
+
+      return {
+        identification: nftId,
+        ...context.nftData,
+      };
+    } catch (err) {
+      console.log({ err });
+    }
+  }
+
+  async createNFT() {
+    this.isLoading = true;
+
+    try {
+      // @ts-ignore
+      const web3StorageToken = await this.getWeb3StorageToken();
+      const web3StorageClient = new Web3Storage({ token: web3StorageToken });
+
+      const [sideAFileCid, sideBFileCid] = await Promise.all([
+        web3StorageClient.put([this.sideAFile], {
+          name: this.sideAFile.name,
+        }),
+        web3StorageClient.put([this.sideBFile], {
+          name: this.sideBFile.name,
+        }),
+      ]);
+
+      const sideA = await this.mintNFT({
+        nftData: {
+          name: this.sideAName,
+          description: this.sideADescription ?? "",
+          fileCID: sideAFileCid,
+          price: this.taps,
+          isDonation: false,
+        },
+      } as AppClientContext<{ nftData: Partial<NFT> }>);
+
+      const sideB = await this.mintNFT({
+        nftData: {
+          name: this.sideBName,
+          description: this.sideBDescription ?? "",
+          fileCID: sideBFileCid,
+          price: this.taps,
+          isDonation: true,
+        },
+      } as AppClientContext<{ nftData: Partial<NFT> }>);
+
+      await Promise.all([
+        // @ts-ignore
+        this.postNFT({ data: sideA }),
+        // @ts-ignore
+        this.postNFT({ data: sideB }),
+      ]);
+    } catch (err) {
+      console.log({ err });
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   renderQuantityInput() {
@@ -135,7 +202,7 @@ class AdminCreateNFT extends Nullstack {
               </p>
 
               <div class="dropdownWrapper">
-                <form action="/" class="dropzone" id="dropzone-a" />
+                <form action="/files" class="dropzone" id="dropzone-a" />
               </div>
 
               <Input label="Name" required={true} bind={this.sideAName} />
@@ -178,7 +245,7 @@ class AdminCreateNFT extends Nullstack {
               </p>
 
               <div class="dropdownWrapper">
-                <form action="/" class="dropzone" id="dropzone-b" />
+                <form action="/files" class="dropzone" id="dropzone-b" />
               </div>
 
               <Input
@@ -221,12 +288,14 @@ class AdminCreateNFT extends Nullstack {
 
           <div class="mt-[37.13px]">
             <Button
+              isLoading={this.isLoading}
               onclick={this.createNFT}
               disabled={
                 !this.sideAFile ||
                 !this.sideBFile ||
                 !this.sideAName ||
-                !this.sideBName
+                !this.sideBName ||
+                !this.taps
               }
             >
               Create NFT

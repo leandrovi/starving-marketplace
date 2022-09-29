@@ -1,4 +1,6 @@
 import Nullstack, { NullstackClientContext, NullstackNode } from "nullstack";
+import { Web3Storage } from "web3.storage";
+import { AppClientContext } from "../client";
 import "../tailwind.css";
 
 import AdminRoutes from "./routes/AdminRoutes";

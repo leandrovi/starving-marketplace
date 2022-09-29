@@ -1,9 +1,10 @@
 import Nullstack, { NullstackClientContext } from "nullstack";
+import { Web3Storage } from "web3.storage";
 import * as fcl from "@onflow/fcl";
 
 import Application from "./src/Application";
 import { fclConfig } from "./src/configs/fcl";
-import { Account, FlowUser } from "./src/appTypes/flow";
+import { FlowUser } from "./src/appTypes/flow";
 
 export type AppClientContext<TProps = unknown> =
   NullstackClientContext<TProps> & {
