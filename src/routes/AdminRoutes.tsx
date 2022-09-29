@@ -123,7 +123,7 @@ class AdminRoutes extends Nullstack {
       <div class="flex flex-row">
         {isAuthenticated && <Menu />}
         {isAuthenticated && <UserInfo />}
-        <main class="bg-darkGray h-screen flex-1">
+        <main class="bg-darkGray h-screen flex-1 overflow-x-scroll">
           <Routes />
         </main>
       </div>
