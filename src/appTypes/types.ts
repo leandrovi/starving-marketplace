@@ -5,3 +5,24 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface NFT {
+  _id: string;
+  identification: number;
+  name: string;
+  description?: string;
+  fileCID?: string;
+  price: number;
+  isDonation: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface NFTTransaction {
+  _id: string;
+  nftId: string;
+  authorAddress: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

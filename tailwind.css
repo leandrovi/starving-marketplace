@@ -1,3 +1,34 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .dropdownWrapper {
+    margin-bottom: 47px;
+
+    form {
+      background: transparent;
+      border: 3px dashed theme("colors.white");
+      height: 138px;
+      min-height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .dz-preview {
+        background: transparent !important;
+      }
+
+      .dz-image {
+        width: 100px !important;
+        height: 100px !important;
+      }
+
+      .dz-error-message,
+      .dz-error-mark,
+      .dz-success-mark {
+        display: none !important;
+      }
+    }
+  }
+}

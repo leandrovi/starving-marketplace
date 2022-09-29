@@ -1,4 +1,6 @@
 import Nullstack, { NullstackClientContext, NullstackNode } from "nullstack";
+import { Web3Storage } from "web3.storage";
+import { AppClientContext } from "../client";
 import "../tailwind.css";
 
 import AdminRoutes from "./routes/AdminRoutes";
@@ -19,6 +21,11 @@ class Application extends Nullstack {
           href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;500&display=swap"
           rel="stylesheet"
         ></link>
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css"
+          type="text/css"
+        />
         <title>Starving Marketplace</title>
       </head>
     );
