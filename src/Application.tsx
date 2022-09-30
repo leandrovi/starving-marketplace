@@ -2,6 +2,7 @@ import Nullstack, { NullstackClientContext, NullstackNode } from "nullstack";
 import { Web3Storage } from "web3.storage";
 import { AppClientContext } from "../client";
 import "../tailwind.css";
+import Home from "./pages/Home/Home";
 
 import AdminRoutes from "./routes/AdminRoutes";
 
@@ -33,7 +34,7 @@ class Application extends Nullstack {
 
   // This is temporary while I focus on the admin
   renderHomeRoutes() {
-    return <p>Home</p>;
+    return <Home />;
   }
 
   render() {

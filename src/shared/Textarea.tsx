@@ -1,5 +1,5 @@
 import Nullstack, { TextareaHTMLAttributes } from "nullstack";
-import { AppClientContext } from "../../../client";
+import { AppClientContext } from "../../client";
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;

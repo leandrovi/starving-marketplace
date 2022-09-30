@@ -10,6 +10,13 @@ module.exports = {
       fontSize: {
         mxl: ["1.375rem", "1.375rem"],
       },
+      backgroundImage: {
+        home: {
+          header: "url('/images/home/header.png')",
+          "left-shade": "url('/images/home/left-shade.png')",
+          "bottom-shade": "url('/images/home/bottom-shade.png')",
+        },
+      },
     },
     fontFamily: {
       kanit: ["Kanit", "sans-serif"],
