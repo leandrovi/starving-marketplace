@@ -5,7 +5,7 @@ const GET_TAP_BALANCE: string = require("../../../../cadence/scripts/GetTAPBalan
 const MINT_TAPS: string = require("../../../../cadence/transactions/MintTAPs.cdc");
 
 import IconTitle from "./IconTitle";
-import Button from "../../../shared/components/Button";
+import Button from "../../../shared/Button";
 import { AppClientContext } from "../../../../client";
 
 interface InputProps {

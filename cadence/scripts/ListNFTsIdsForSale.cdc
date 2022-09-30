@@ -16,3 +16,4 @@ pub fun main(address: Address): {UInt64: UFix64?} {
     return idsAndPrices
 
 }
+ 

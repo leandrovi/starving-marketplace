@@ -2,12 +2,13 @@ import Nullstack, { NullstackClientContext, NullstackNode } from "nullstack";
 import * as fcl from "@onflow/fcl";
 
 import { AppClientContext } from "../../client";
-import Logo from "../shared/components/Logo";
+import Logo from "../shared/Logo";
 import { maskWalletAddress } from "../utils/maskWalletAddress";
 
 import AdminDashboard from "../pages/AdminDashboard/AdminDashboard";
 import AdminAuth from "../pages/AdminAuth/AdminAuth";
 import AdminCreateNFT from "../pages/AdminCreateNFT/AdminCreateNFT";
+import AdminNFTsList from "../pages/AdminNFTsList/AdminNFTsList";
 
 declare function Menu(): NullstackNode;
 declare function MenuItem(): NullstackNode;
@@ -111,6 +112,7 @@ class AdminRoutes extends Nullstack {
         <AdminDashboard route="/admin" />
         <AdminAuth route="/admin/auth" />
         <AdminCreateNFT route="/admin/nfts/create" />
+        <AdminNFTsList route="/admin/nfts" />
         {/* TODO: add other routes here */}
       </>
     );

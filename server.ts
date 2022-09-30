@@ -11,14 +11,8 @@ context.start = async function start() {
 };
 
 context.server.use(fileUpload());
-
-context.server.post("/files", async (request, response) => {
-  const { files } = request;
-  const { file } = files;
-  // const cid = await context.web3StorageClient.put([file]);
-  const cid = "1234";
-  console.log("stored file with cid:", cid);
-  response.json({ file: { ...file, cid } });
+context.server.post("/files", async (_, response) => {
+  response.json({ ok: true });
 });
 
 export { ServerContext };

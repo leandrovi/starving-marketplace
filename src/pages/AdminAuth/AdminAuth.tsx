@@ -2,8 +2,8 @@ import Nullstack from "nullstack";
 import * as fcl from "@onflow/fcl";
 
 import { AppClientContext } from "../../../client";
-import Button from "../../shared/components/Button";
-import Logo from "../../shared/components/Logo";
+import Button from "../../shared/Button";
+import Logo from "../../shared/Logo";
 import { FlowUser } from "../../appTypes/flow";
 import { UserModel } from "../../models/UserModel";
 

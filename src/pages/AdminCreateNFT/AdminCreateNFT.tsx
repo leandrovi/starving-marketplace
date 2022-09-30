@@ -8,9 +8,8 @@ import Dropzone from "dropzone";
 const MINT_NFT: string = require("../../../cadence/transactions/MintStarvingChildrenNFT.cdc");
 
 import { AppClientContext } from "../../../client";
-import Button from "../../shared/components/Button";
-import Input from "../../shared/components/Input";
-import Textarea from "../../shared/components/Textarea";
+import Button from "../../shared/Button";
+import Input from "../../shared/Input";
 import { NFTModel } from "../../models/NFTModel";
 import { NFT } from "../../appTypes/types";
 
@@ -31,6 +30,7 @@ const dropdownConfig = {
 
 class AdminCreateNFT extends Nullstack {
   isLoading = false;
+  mintComplete = false;
   sideADropzone: Dropzone;
   sideBDropzone: Dropzone;
 
@@ -127,6 +127,7 @@ class AdminCreateNFT extends Nullstack {
           name: this.sideAName,
           description: this.sideADescription ?? "",
           fileCID: sideAFileCid,
+          fileName: this.sideAFile.name,
           price: this.taps,
           isDonation: false,
         },
@@ -137,10 +138,13 @@ class AdminCreateNFT extends Nullstack {
           name: this.sideBName,
           description: this.sideBDescription ?? "",
           fileCID: sideBFileCid,
+          fileName: this.sideBFile.name,
           price: this.taps,
           isDonation: true,
         },
       } as AppClientContext<{ nftData: Partial<NFT> }>);
+
+      console.log({ sideA, sideB });
 
       await Promise.all([
         // @ts-ignore
@@ -152,6 +156,11 @@ class AdminCreateNFT extends Nullstack {
       console.log({ err });
     } finally {
       this.isLoading = false;
+      this.mintComplete = true;
+
+      setTimeout(() => {
+        this.mintComplete = false;
+      }, 3000);
     }
   }
 
@@ -213,12 +222,12 @@ class AdminCreateNFT extends Nullstack {
                 helperText="Number of Editions that will be created"
                 bind={this.maxEditions}
               />
-              {/* <Textarea
+              <Input
                 label="Description"
                 rows={4}
                 description="The description will be included on the item's detail page underneath its image. Markdown syntax is supported."
                 bind={this.sideADescription}
-              /> */}
+              />
               <QuantityInput placeholder="1.34" />
 
               <p class="mt-[49px] text-lg drop-shadow-[0_0_14px_rgba(255,255,255,0.7)] mb-1 font-light">
@@ -267,13 +276,13 @@ class AdminCreateNFT extends Nullstack {
                 disabled={true}
                 bind={this.maxEditions}
               />
-              {/* <Textarea
+              <Input
                 name="descriptionB"
                 label="Description"
                 rows={4}
                 description="The description will be included on the item's detail page underneath its image. Markdown syntax is supported."
                 bind={this.sideBDescription}
-              /> */}
+              />
               <div class="mt-6 flex items-center justify-center px-[30px] pt-[25px] pb-[43px] relative w-full border border-yellow">
                 <p class="font-light text-sm text-lightGray">
                   This NFT will be generated at the same time as the original
@@ -286,7 +295,7 @@ class AdminCreateNFT extends Nullstack {
             </div>
           </div>
 
-          <div class="mt-[37.13px]">
+          <div class="mt-[37.13px] flex items-center justify-center">
             <Button
               isLoading={this.isLoading}
               onclick={this.createNFT}
@@ -300,6 +309,11 @@ class AdminCreateNFT extends Nullstack {
             >
               Create NFT
             </Button>
+            {this.mintComplete && (
+              <p class="font-thin max-w-[200px] ml-6">
+                🎉 Congrats! You have just create two NFTs, way to go!
+              </p>
+            )}
           </div>
         </div>
       </section>

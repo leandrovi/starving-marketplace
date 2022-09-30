@@ -11,9 +11,11 @@ export interface NFT {
   identification: number;
   name: string;
   description?: string;
-  fileCID?: string;
+  fileCID: string;
+  fileName: string;
   price: number;
   isDonation: boolean;
+  isListedForSale?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
